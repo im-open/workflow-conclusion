@@ -1,19 +1,21 @@
-name: 'JavaScript Action Template'
+name: 'workflow-conclusion'
 
-description: 'Add description here'
+description: 'This action outputs the outcomes of jobs within the workflow.'
 
 inputs:
-  input-1:
-    description: 'Add a description here'
+  github-token:
+    description: Secret GitHub API token to use for making API requests.
+    default: ${{ github.token }}
     required: true
-  input-2:
-    description: 'Add a description here'
+  fallback-conclusion:
+    description: 'The fallback conclusion to use'
     required: false
+    default: skipped
 
 outputs:
-  output-1:
-    description: 'Add a description here'
+  conclusion:
+    description: Workflow conclusion
 
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'dist/index.js' # Can also be a relative path to the js file you want executed

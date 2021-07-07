@@ -1,80 +1,57 @@
-# javascript-action-template
+# workflow-conclusion
 
-This template can be used to quickly start a new custom js action repository.  Click the `Use this template` button at the top to get started.
+This action will examine the outcome for each completed job in a workflow run to output a single outcome for the workflow.
 
-## TODOs
-- Readme
-  - [ ] Update the Inputs section with the correct action inputs
-  - [ ] Update the Outputs section with the correct action outputs
-  - [ ] Update the Example section with the correct usage   
-- package.json
-  - [ ] Update the `name` with the new action value
-- main.js
-  - [ ] Implement your custom javascript action
-- action.yml
-  - [ ] Fill in the correct name, description, inputs and outputs
-- check-for-unstaged-changes.sh
-  - [ ] If you encounter a permission denied error when the build.yml workflow runs, execute the following command: `git update-index --chmod=+x ./check-for-unstaged-changes.sh`
-- .prettierrc.json
-  - [ ] Update any preferences you might have
-- CODEOWNERS
-  - [ ] Update as appropriate
-- Repository Settings
-  - [ ] On the *Options* tab check the box to *Automatically delete head branches*
-  - [ ] On the *Options* tab update the repository's visibility
-  - [ ] On the *Branches* tab add a branch protection rule
-    - [ ] Check *Require pull request reviews before merging*
-    - [ ] Check *Dismiss stale pull request approvals when new commits are pushed*
-    - [ ] Check *Require review from Code Owners*
-    - [ ] Check *Include Administrators*
-  - [ ] On the *Manage Access* tab add the appropriate groups
-- About Section (accessed on the main page of the repo, click the gear icon to edit)
-  - [ ] The repo should have a short description of what it is for
-  - [ ] Add one of the following topic tags:
-    | Topic Tag       | Usage                                    |
-    | --------------- | ---------------------------------------- |
-    | az              | For actions related to Azure             |
-    | code            | For actions related to building code     |
-    | certs           | For actions related to certificates      |
-    | db              | For actions related to databases         |
-    | git             | For actions related to Git               |
-    | iis             | For actions related to IIS               |
-    | microsoft-teams | For actions related to Microsoft Teams   |
-    | svc             | For actions related to Windows Services  |
-    | jira            | For actions related to Jira              |
-    | meta            | For actions related to running workflows |
-    | pagerduty       | For actions related to PagerDuty         |
-    | test            | For actions related to testing           |
-    | tf              | For actions related to Terraform         |
-  - [ ] Add any additional topics for an action if they apply    
-    
+The conclusion is determined by:
+ - First looking for any Skipped jobs and if found the conclusion is set to `skipped`
+ - Then looking for any Cancelled jobs and if found the conclusion is set to `cancelled`
+ - Then looking for any Failed jobs and if found the conclusion is set to `failure`
+ - Finally looking for any Successful jobs and if found the conclusion is set to `success`
+ - If none of the statuses are found, it will set the conclusion to the fallback value which defaults to `skipped`
 
 ## Inputs
-| Parameter | Is Required | Description           |
-| --------- | ----------- | --------------------- |
-| `input-1` | true        | Description goes here |
-| `input-2` | false       | Description goes here |
+| Parameter             | Is Required | Description                                                                         |
+| --------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| `github-token`        | true        | The token used to make API requests                                                 |
+| `fallback-conclusion` | false       | The fallback conclusion to use when one cannot be determined.  Defaults to skipped. |
 
 ## Outputs
-| Output     | Description           |
-| ---------- | --------------------- |
-| `output-1` | Description goes here |
+| Output       | Description              |
+| ------------ | ------------------------ |
+| `conclusion` | The workflow conclusion. |
 
 ## Example
 
 ```yml
-# TODO: Fill in the correct usage
 jobs:
-  job1:
-    runs-on: [self-hosted, ubuntu-20.04]
+  approve:
+    runs-on: [ubuntu-20.04]
     steps:
-      - uses: actions/checkout@v2
+      run: check-for-approval.sh
 
-      - name: Add Step Here
-        uses: im-open/this-repo@v1
+  deploy:
+    runs-on: [ubuntu-20.04]
+    steps:
+      run: deploy-the-code.sh
+
+  update-deployment-board:
+    runs-on: [ubuntu-20.04]
+    needs: [approval, deploy]
+    if: always()
+    steps:
+      - uses: im-open/workflow-conclusion@v1.0.0
+        id: conclusion
         with:
-          input-1: 'abc'
-          input-2: '123
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update Deployment Board
+        uses: im-open/update-deployment-board@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+          environment: ${{ github.event.inputs.environment }}
+          board-number: 1
+          ref: ${{ github.event.inputs.branch-tag-sha }}
+          deploy-status: ${{ env.WORKFLOW_CONCLUSION }} # can also use ${{ steps.conclusion.conclusion }}
 ```
 
 ## Recompiling
