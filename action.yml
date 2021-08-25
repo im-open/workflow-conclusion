@@ -11,9 +11,13 @@ inputs:
     description: 'The fallback conclusion to use'
     required: false
     default: skipped
+  additional-conclusions:
+    description: 'A JSON-parseable array of additional conclusions to consider.'
+    required: false
+    default: ''
 
 outputs:
-  conclusion:
+  workflow-conclusion:
     description: Workflow conclusion
 
 runs:
