@@ -35,6 +35,8 @@ async function getJobOutcomes() {
 
 function processAdditionalOutcomes(outcomes) {
   let additionalConclusionsRaw = core.getInput('additional-conclusions');
+  if (!additionalConclusionsRaw || additionalConclusionsRaw.trim().length === 0) return;
+
   let additionalConclusions = JSON.parse(additionalConclusionsRaw);
   const willNotContribute = 'This conclusion will not contribute to the final workflow conclusion.';
   core.info('\nAdditional Conclusions:');
