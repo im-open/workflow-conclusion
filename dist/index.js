@@ -5749,7 +5749,7 @@ var require_github = __commonJS({
   }
 });
 
-// main.js
+// src/main.js
 var core = require_core();
 var github = require_github();
 var ghToken = core.getInput('github-token');
