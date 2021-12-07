@@ -90,13 +90,8 @@ async function run() {
   const fallback = core.getInput('fallback-conclusion');
   let conclusion = fallback;
 
-  // Skipped seems to be the outcome when it is cancelled sometimes, so check
-  // for that right after the cancelled type. Then if there are any failures set
-  // it as a failure, otherwise it will most likely be success.
   if (outcomes.includes('cancelled')) {
     conclusion = 'cancelled';
-  } else if (outcomes.includes('skipped')) {
-    conclusion = 'skipped';
   } else if (outcomes.includes('failure')) {
     conclusion = 'failure';
   } else if (outcomes.includes('success')) {

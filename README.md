@@ -1,6 +1,7 @@
 # workflow-conclusion
 
-This action will: 
+This action will:
+
 1. Use the [Actions REST API] to get the conclusion for each previous job.
    - The API call provides the `conclusion` which is the job status after `continue-on-error` is applied.
    - In addition to jobs, the API call also includes status check results.
@@ -8,18 +9,18 @@ This action will:
 3. Determine a single workflow conclusion based on the API results and arguments.  
 
 The action will interpret a wider range of inputs in the `additional-conclusions` argument than the standard GitHub values of *cancelled, skipped, failure and success*.  This allows using the `outcome` of a step as well as the output that an action might set.
-- `[cancelled | canceled | cancel]` are accepted and interpreted as `cancelled`
-- `[skipped | skip]` are accepted and interpreted as `skipped`
-- `[failure| failing| failed| fail]` are accepted and interpreted as `failure`
-- `[success| passing| passed| pass]` are accepted and interpreted as `success`
-  
-The final workflow conclusion is determined by:
- - First looking for any Cancelled conclusions and if found the conclusion is set to `cancelled`
- - Then looking for any Skipped conclusions and if found the conclusion is set to `skipped`
- - Then looking for any Failed conclusions and if found the conclusion is set to `failure`
- - Finally looking for any Successful conclusions and if found the conclusion is set to `success`
- - If none of the statuses are found, it will set the workflow conclusion to the fallback value which defaults to `skipped`
 
+- `[cancelled | canceled | cancel]` are accepted and interpreted as `cancelled`
+- `[failure | failing | failed | fail]` are accepted and interpreted as `failure`
+- `[success | passing | passed | pass]` are accepted and interpreted as `success`
+- `[skipped | skip]` are accepted and interpreted as `skipped`
+
+The final workflow conclusion is determined by:
+
+- First looking for any Cancelled conclusions and if found the conclusion is set to `cancelled`
+- Then looking for any Failed conclusions and if found the conclusion is set to `failure`
+- Finally looking for any Successful conclusions and if found the conclusion is set to `success`
+- If none of the statuses are found, it will set the workflow conclusion to the fallback value which defaults to `skipped`
 
 ## Index
 
@@ -74,7 +75,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v1.0.4
+      - uses: im-open/workflow-conclusion@v2.0.0
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -100,6 +101,7 @@ jobs:
 ## Contributing
 
 When creating new PRs please ensure:
+
 1. The action has been recompiled.  See the [Recompiling](#recompiling) section below for more details.
 2. For major or minor changes, at least one of the commit messages contains the appropriate `+semver:` keywords listed under [Incrementing the Version](#incrementing-the-version).
 3. The `README.md` example has been updated with the new version.  See [Incrementing the Version](#incrementing-the-version).
