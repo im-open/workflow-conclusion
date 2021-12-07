@@ -5836,8 +5836,6 @@ async function run() {
   let conclusion = fallback;
   if (outcomes.includes('cancelled')) {
     conclusion = 'cancelled';
-  } else if (outcomes.includes('skipped')) {
-    conclusion = 'skipped';
   } else if (outcomes.includes('failure')) {
     conclusion = 'failure';
   } else if (outcomes.includes('success')) {

@@ -90,11 +90,10 @@ async function run() {
   const fallback = core.getInput('fallback-conclusion');
   let conclusion = fallback;
 
-  
-  if (outcomes.includes('failure')) {
-    conclusion = 'failure';
-  } else if (outcomes.includes('cancelled')) {
+  if (outcomes.includes('cancelled')) {
     conclusion = 'cancelled';
+  } else if (outcomes.includes('failure')) {
+    conclusion = 'failure';
   } else if (outcomes.includes('success')) {
     conclusion = 'success';
   }
