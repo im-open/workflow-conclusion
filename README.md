@@ -64,7 +64,7 @@ jobs:
       
       - name: Process dotnet test results and create a status check
         id: test_check
-        uses: im-open/process-dotnet-test-results@v2.2.1
+        uses: im-open/process-dotnet-test-results@v2.2.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           
@@ -75,7 +75,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v2.1.0
+      - uses: im-open/workflow-conclusion@v2.1.1
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
       
       # Use the workflow conclusion below
       - name: Update Deployment Board
-        uses: im-open/update-deployment-board@v1.5.0
+        uses: im-open/update-deployment-board@v1.5.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN}}
           environment: ${{ github.event.inputs.environment }}

@@ -1,36 +1,43 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const ghToken = core.getInput('github-token');
+// When used, this requiredArgOptions will cause the action to error if a value has not been provided.
+const requiredArgOptions = {
+  required: true,
+  trimWhitespace: true
+};
+
+const ghToken = core.getInput('github-token', requiredArgOptions);
 const octokit = github.getOctokit(ghToken);
 const owner = github.context.repo.owner;
 const repo = github.context.repo.repo;
 
 async function getJobOutcomes() {
-  try {
-    const response = await octokit.rest.actions.listJobsForWorkflowRun({
+  let outcomes = [];
+  await octokit
+    .paginate(octokit.rest.actions.listJobsForWorkflowRun, {
       owner,
       repo,
       run_id: github.context.runId
-    });
-    if (!response || !response.data || !response.data.jobs || response.data.jobs.length === 0) {
-      core.info(`There were no jobs associated with the workflow run.`);
-      return [];
-    }
-    let outcomes = [];
-    core.info('\nIndividual Job Statuses:');
-    response.data.jobs.forEach(j => {
-      if (j.conclusion) {
-        core.info(`\t${j.name}: ${j.conclusion}`);
-        outcomes.push(j.conclusion.toLowerCase());
+    })
+    .then(jobs => {
+      if (jobs.length > 0) {
+        core.info('\nIndividual Job Statuses:');
+        for (const j of jobs) {
+          if (j.conclusion) {
+            core.info(`\t${j.name}: ${j.conclusion}`);
+            outcomes.push(j.conclusion.toLowerCase());
+          } else {
+            core.info(`\t${j.name}: Has not concluded yet.`);
+          }
+        }
       } else {
-        core.info(`\t${j.name}: Has not concluded yet.`);
+        core.info(`There were no jobs associated with the workflow run.`);
       }
+    })
+    .catch(error => {
+      core.info(`An error occurred getting the jobs for the workflow run: ${error.message}`);
     });
-    return outcomes;
-  } catch (error) {
-    core.info(`An error occurred getting the jobs for the workflow run: ${error}`);
-  }
 }
 
 function processAdditionalOutcomes(outcomes) {
