@@ -38,6 +38,7 @@ async function getJobOutcomes() {
     .catch(error => {
       core.info(`An error occurred getting the jobs for the workflow run: ${error.message}`);
     });
+  return outcomes;
 }
 
 function processAdditionalOutcomes(outcomes) {
