@@ -1,6 +1,5 @@
-name: 'workflow-conclusion'
-
-description: 'This action outputs the outcomes of jobs within the workflow.'
+name: workflow-conclusion
+description: This action outputs the outcomes of jobs within the workflow.
 
 inputs:
   github-token:
