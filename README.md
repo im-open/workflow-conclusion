@@ -64,6 +64,7 @@ jobs:
       
       - name: Process dotnet test results and create a status check
         id: test_check
+        # You may also reference just the major or major.minor version
         uses: im-open/process-dotnet-test-results@v2.2.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -75,7 +76,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v2.1.2
+      - uses: im-open/workflow-conclusion@v2.1.3
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
