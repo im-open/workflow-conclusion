@@ -55,7 +55,7 @@ function processAdditionalOutcomes(outcomes, fallback) {
     (!conclusion || conclusion === fallback.toLowerCase()) && suppressFallBackWarnings
       ? core.info(message)
       : core.warning(message);
-  }
+  };
 
   additionalConclusions.forEach(ac => {
     const cleanConclusion = ac.conclusion.toLowerCase().trim();
@@ -86,7 +86,10 @@ function processAdditionalOutcomes(outcomes, fallback) {
         handleFallbackWarnings(`${ac.name}: ${ac.conclusion} => skipped`, cleanConclusion);
         break;
       case '':
-        handleFallbackWarnings(`${ac.name} appears to be empty because the step may not have been run. ${willNotContribute}`, cleanConclusion);
+        handleFallbackWarnings(
+          `${ac.name} appears to be empty because the step may not have been run. ${willNotContribute}`,
+          cleanConclusion
+        );
         break;
       default:
         core.warning(

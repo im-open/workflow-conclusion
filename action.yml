@@ -16,7 +16,7 @@ inputs:
   suppress-fallback-warnings:
     description: 'Whether to suppress warnings about the fallback conclusion.'
     required: true
-    default: false
+    default: 'false'
 
 outputs:
   workflow-conclusion:
