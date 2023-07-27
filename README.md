@@ -34,15 +34,16 @@ The final workflow conclusion is determined by:
 - [License](#license)
 
 ## Inputs
-| Parameter                | Is Required | Description                                                                                                                                                                                                                                                                                                     |
-| ------------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `github-token`           | true        | The token used to make API requests                                                                                                                                                                                                                                                                             |
-| `additional-conclusions` | false       | A JSON-parseable array of additional conclusions to consider.  See the comments above for accepted values.  See the [Usage Example](#usage) below for the correct format.  <br/><br/>This may be helpful if `continue-on-error` is used on a steps or for actions that provide an output with their own status. |
-| `fallback-conclusion`    | false       | The fallback conclusion to use when one cannot be determined.  Defaults to skipped.                                                                                                                                                                                                                             |
+| Parameter                    | Is Required | Description                                                                                                                                                                                                                                                                                                     |
+|------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `github-token`               | true        | The token used to make API requests                                                                                                                                                                                                                                                                             |
+| `additional-conclusions`     | false       | A JSON-parseable array of additional conclusions to consider.  See the comments above for accepted values.  See the [Usage Example](#usage) below for the correct format.  <br/><br/>This may be helpful if `continue-on-error` is used on a steps or for actions that provide an output with their own status. |
+| `fallback-conclusion`        | false       | The fallback conclusion to use when one cannot be determined.  Defaults to skipped.                                                                                                                                                                                                                             |
+| `suppress-fallback-warnings` | false       | Whether to suppress warnings about the fallback conclusion.  Defaults to create warnings.                                                                                                                                                                                                                       |
 
 ## Outputs
 | Output                | Description              |
-| --------------------- | ------------------------ |
+|-----------------------|--------------------------|
 | `workflow-conclusion` | The workflow conclusion. |
 
 ## Usage
@@ -76,7 +77,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v2.1.3
+      - uses: im-open/workflow-conclusion@v2.2.0
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

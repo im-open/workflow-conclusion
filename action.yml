@@ -13,6 +13,10 @@ inputs:
   additional-conclusions:
     description: 'A JSON-parseable array of additional conclusions to consider.'
     required: false
+  suppress-fallback-warnings:
+    description: 'Whether to suppress warnings about the fallback conclusion.'
+    required: true
+    default: 'false'
 
 outputs:
   workflow-conclusion:

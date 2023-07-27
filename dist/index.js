@@ -17116,16 +17116,22 @@ async function getJobOutcomes() {
       }
     })
     .catch(error => {
-      core.info(`An error occurred getting the jobs for the workflow run: ${error.message}`);
+      core.error(`An error occurred getting the jobs for the workflow run: ${error.message}`);
     });
   return outcomes;
 }
-function processAdditionalOutcomes(outcomes) {
+function processAdditionalOutcomes(outcomes, fallback) {
   let additionalConclusionsRaw = core.getInput('additional-conclusions');
+  const suppressFallBackWarnings = core.getBooleanInput('suppress-fallback-warnings');
   if (!additionalConclusionsRaw || additionalConclusionsRaw.trim().length === 0) return;
   let additionalConclusions = JSON.parse(additionalConclusionsRaw);
   const willNotContribute = 'This conclusion will not contribute to the final workflow conclusion.';
   core.info('\nAdditional Conclusions:');
+  const handleFallbackWarnings = (message, conclusion) => {
+    (!conclusion || conclusion === fallback.toLowerCase()) && suppressFallBackWarnings
+      ? core.info(message)
+      : core.warning(message);
+  };
   additionalConclusions.forEach(ac => {
     const cleanConclusion = ac.conclusion.toLowerCase().trim();
     switch (cleanConclusion) {
@@ -17147,16 +17153,17 @@ function processAdditionalOutcomes(outcomes) {
       case 'canceled':
       case 'cancel':
         outcomes.push('cancelled');
-        core.warning(`${ac.name}: ${ac.conclusion} => cancelled`);
+        handleFallbackWarnings(`${ac.name}: ${ac.conclusion} => cancelled`, cleanConclusion);
         break;
       case 'skipped':
       case 'skip':
         outcomes.push('skipped');
-        core.warning(`${ac.name}: ${ac.conclusion} => skipped`);
+        handleFallbackWarnings(`${ac.name}: ${ac.conclusion} => skipped`, cleanConclusion);
         break;
       case '':
-        core.warning(
-          `${ac.name} appears to be empty because the step may not have been run.  ${willNotContribute}`
+        handleFallbackWarnings(
+          `${ac.name} appears to be empty because the step may not have been run. ${willNotContribute}`,
+          cleanConclusion
         );
         break;
       default:
@@ -17169,8 +17176,8 @@ function processAdditionalOutcomes(outcomes) {
 }
 async function run() {
   let outcomes = await getJobOutcomes();
-  processAdditionalOutcomes(outcomes);
   const fallback = core.getInput('fallback-conclusion');
+  processAdditionalOutcomes(outcomes, fallback);
   let conclusion = fallback;
   if (outcomes.includes('cancelled')) {
     conclusion = 'cancelled';
