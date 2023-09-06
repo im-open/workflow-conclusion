@@ -155,10 +155,6 @@ This project has adopted the [im-open's Code of Conduct](https://github.com/im-o
 
 Copyright &copy; 2023, Extend Health, LLC. Code released under the [MIT license](LICENSE).
 
-[Actions REST API]: https://docs.github.com/en/rest/reference/actions#list-jobs-for-a-workflow-run
-[git-version-lite]: https://github.com/im-open/git-version-lite
-[esbuild]: https://esbuild.github.io/getting-started/#bundling-for-node
-
 <!-- Links -->
 [Incrementing the Version]: #incrementing-the-version
 [Recompiling Manually]: #recompiling-manually
@@ -167,3 +163,6 @@ Copyright &copy; 2023, Extend Health, LLC. Code released under the [MIT license]
 [usage examples]: #usage-examples
 [build-and-review-pr]: ./.github/workflows/build-and-review-pr.yml
 [increment-version-on-merge]: ./.github/workflows/increment-version-on-merge.yml
+[Actions REST API]: https://docs.github.com/en/rest/reference/actions#list-jobs-for-a-workflow-run
+[git-version-lite]: https://github.com/im-open/git-version-lite
+[esbuild]: https://esbuild.github.io/getting-started/#bundling-for-node
