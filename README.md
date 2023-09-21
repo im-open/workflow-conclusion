@@ -42,7 +42,7 @@ The final workflow conclusion is determined by:
 |------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `github-token`               | true        | The token used to make API requests                                                                                                                                                                                                                                                                             |
 | `additional-conclusions`     | false       | A JSON-parseable array of additional conclusions to consider.  See the comments above for accepted values.  See the [Usage Example](#usage) below for the correct format.  <br/><br/>This may be helpful if `continue-on-error` is used on a steps or for actions that provide an output with their own status. |
-| `fallback-conclusion`        | false       | The fallback conclusion to use when one cannot be determined.  Defaults to skipped.                                                                                                                                                                                                                             |
+| `fallback-conclusion`        | false       | The fallback conclusion to use when a job's or step's additional conclusion cannot be determined.  Defaults to skipped.                                                                                                                                                                                         |
 | `suppress-fallback-warnings` | false       | Whether to suppress warnings about the fallback conclusion.  Defaults to create warnings.                                                                                                                                                                                                                       |
 
 ## Outputs
@@ -82,7 +82,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v2.2.0
+      - uses: im-open/workflow-conclusion@v2.2.1
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

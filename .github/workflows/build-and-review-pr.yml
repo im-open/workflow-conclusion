@@ -60,3 +60,137 @@ jobs:
       # The npm script to run to build the action.  This is typically 'npm run build' if the
       # action needs to be compiled.  For composite-run-steps actions this is typically empty.
       build-command: 'npm run build'
+
+  pre-test:
+    runs-on: ubuntu-latest
+    env:
+      WORKFLOW_CONCLUSION: ''
+
+    steps:
+      - run: echo "This job will be successful!"
+
+      #--------------------------------------
+      # OUTCOME INCLUDES UNKNOWN CONCLUSION
+      #--------------------------------------
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo "WORKFLOW_CONCLUSION=''" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v3
+
+      - name: When an unknown conclusion is present
+        uses: ./
+        if: always()
+        id: unknown
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          additional-conclusions: |
+            [
+              { "name": "dotnet test", "conclusion" : "it happened" },
+              { "name": "dotnet coverage", "conclusion" : "yep" }
+            ]
+          fallback-conclusion: aw-snap
+
+      - name: Then the outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.unknown.outcome }}"
+
+      - name: And outputs.workflow_conclusion and env.WORKFLOW_CONCLUSION should be the fallback value
+        if: always()
+        run: |
+          ./test/assert-values-match.sh --name "env.WORKFLOW_CONCLUSION" --expected "aw-snap" --actual "${{ env.WORKFLOW_CONCLUSION }}"
+          ./test/assert-values-match.sh --name "outputs.workflow_conclusion" --expected "aw-snap" --actual "${{ steps.unknown.outputs.workflow_conclusion }}"
+      
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo ""
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [pre-test]
+
+    env:
+      WORKFLOW_CONCLUSION: ''
+
+    steps:
+      - uses: actions/checkout@v3
+
+      #--------------------------------------
+      # OUTCOME INCLUDES SUCCESS
+      #--------------------------------------
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: When a previous job runs successfully
+        uses: ./
+        if: always()
+        id: success
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Then the outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.success.outcome }}"
+
+      - name: And outputs.workflow_conclusion and env.WORKFLOW_CONCLUSION should be success
+        if: always()
+        run: |
+          ./test/assert-values-match.sh --name "env.WORKFLOW_CONCLUSION" --expected "success" --actual "${{ env.WORKFLOW_CONCLUSION }}"
+          ./test/assert-values-match.sh --name "outputs.workflow_conclusion" --expected "success" --actual "${{ steps.success.outputs.workflow_conclusion }}"
+
+      #--------------------------------------
+      # OUTCOME INCLUDES CANCELLED
+      #--------------------------------------
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo "WORKFLOW_CONCLUSION=''" >> $GITHUB_ENV
+
+      - name: When a cancel conclusion is present
+        uses: ./
+        if: always()
+        id: cancelled
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          additional-conclusions: |
+            [
+              { "name": "dotnet test", "conclusion" : "cancel" },
+              { "name": "dotnet coverage", "conclusion" : "failure" },
+              { "name": "jest test", "conclusion" : "success" }
+            ]
+
+      - name: Then the outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.cancelled.outcome }}"
+
+      - name: And outputs.workflow_conclusion and env.WORKFLOW_CONCLUSION should be cancelled
+        if: always()
+        run: |
+          ./test/assert-values-match.sh --name "env.WORKFLOW_CONCLUSION" --expected "cancelled" --actual "${{ env.WORKFLOW_CONCLUSION }}"
+          ./test/assert-values-match.sh --name "outputs.workflow_conclusion" --expected "cancelled" --actual "${{ steps.cancelled.outputs.workflow_conclusion }}"
+
+      #--------------------------------------
+      # OUTCOME INCLUDES FAILURE
+      #--------------------------------------
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo "WORKFLOW_CONCLUSION=''" >> $GITHUB_ENV
+
+      - name: When a failure conclusion is present
+        uses: ./
+        if: always()
+        id: failure
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          additional-conclusions: |
+            [
+              { "name": "dotnet test", "conclusion" : "failure" },
+              { "name": "jest test", "conclusion" : "success" }
+            ]
+
+      - name: Then the outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.failure.outcome }}"
+
+      - name: Then outputs.workflow_conclusion and env.WORKFLOW_CONCLUSION should be failure
+        if: always()
+        run: |
+          ./test/assert-values-match.sh --name "env.WORKFLOW_CONCLUSION" --expected "failure" --actual "${{ env.WORKFLOW_CONCLUSION }}"
+          ./test/assert-values-match.sh --name "outputs.workflow_conclusion" --expected "failure" --actual "${{ steps.failure.outputs.workflow_conclusion }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------'
+        run: echo ""
