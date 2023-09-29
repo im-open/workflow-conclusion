@@ -49,7 +49,7 @@ The final workflow conclusion is determined by:
 
 | Output                | Description              |
 |-----------------------|--------------------------|
-| `workflow-conclusion` | The workflow conclusion. |
+| `workflow_conclusion` | The workflow conclusion. |
 
 ## Usage Examples
 
@@ -102,7 +102,7 @@ jobs:
           environment: ${{ github.event.inputs.environment }}
           board-number: 1
           ref: ${{ github.event.inputs.branch-tag-sha }}
-          deploy-status: ${{ env.WORKFLOW_CONCLUSION }} # can also use ${{ steps.conclusion.workflow-conclusion }}
+          deploy-status: ${{ env.WORKFLOW_CONCLUSION }} # can also use ${{ steps.conclusion.workflow_conclusion }}
 ```
 
 ## Contributing
