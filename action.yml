@@ -19,7 +19,7 @@ inputs:
     default: 'false'
 
 outputs:
-  workflow-conclusion:
+  workflow_conclusion:
     description: Workflow conclusion
 
 runs:
