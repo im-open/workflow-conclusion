@@ -83,7 +83,7 @@ jobs:
     needs: [test, auto-deploy-to-dev]
     if: always()
     steps:
-      - uses: im-open/workflow-conclusion@v2.2.1
+      - uses: im-open/workflow-conclusion@v2.2.2
         id: conclusion
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
