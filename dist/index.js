@@ -17120,21 +17120,22 @@ async function getJobOutcomes() {
     });
   return outcomes;
 }
-function processAdditionalOutcomes(outcomes, fallback) {
-  let additionalConclusionsRaw = core.getInput('additional-conclusions');
+function processAdditionalOutcomes(outcomes, fallbackConclusion) {
+  const additionalConclusionsRaw = core.getInput('additional-conclusions');
   const suppressFallBackWarnings = core.getBooleanInput('suppress-fallback-warnings');
   if (!additionalConclusionsRaw || additionalConclusionsRaw.trim().length === 0) return;
-  let additionalConclusions = JSON.parse(additionalConclusionsRaw);
-  const willNotContribute = 'This conclusion will not contribute to the final workflow conclusion.';
+  const willNotContributeMsg = `This conclusion will not contribute to the final workflow conclusion.`;
+  const additionalConclusions = JSON.parse(additionalConclusionsRaw);
   core.info('\nAdditional Conclusions:');
-  const handleFallbackWarnings = (message, conclusion) => {
-    (!conclusion || conclusion === fallback.toLowerCase()) && suppressFallBackWarnings
+  const printConclusion = (message, conclusion) => {
+    const conclusionIsEmptyOrDefault = !conclusion || conclusion === fallbackConclusion;
+    suppressFallBackWarnings && conclusionIsEmptyOrDefault
       ? core.info(message)
       : core.warning(message);
   };
   additionalConclusions.forEach(ac => {
-    const cleanConclusion = ac.conclusion.toLowerCase().trim();
-    switch (cleanConclusion) {
+    const formattedConclusion = ac.conclusion.toLowerCase().trim();
+    switch (formattedConclusion) {
       case 'failing':
       case 'failed':
       case 'failure':
@@ -17153,32 +17154,31 @@ function processAdditionalOutcomes(outcomes, fallback) {
       case 'canceled':
       case 'cancel':
         outcomes.push('cancelled');
-        handleFallbackWarnings(`${ac.name}: ${ac.conclusion} => cancelled`, cleanConclusion);
+        const cancelledMessage = `${ac.name}: ${ac.conclusion} => cancelled`;
+        printConclusion(cancelledMessage, formattedConclusion);
         break;
       case 'skipped':
       case 'skip':
         outcomes.push('skipped');
-        handleFallbackWarnings(`${ac.name}: ${ac.conclusion} => skipped`, cleanConclusion);
+        const skippedMessage = `${ac.name}: ${ac.conclusion} => skipped`;
+        printConclusion(skippedMessage, formattedConclusion);
         break;
       case '':
-        handleFallbackWarnings(
-          `${ac.name} appears to be empty because the step may not have been run. ${willNotContribute}`,
-          cleanConclusion
-        );
+        const emptyMessage = `${ac.name} appears to be empty because the step may not have been run. ${willNotContributeMsg}`;
+        printConclusion(emptyMessage, formattedConclusion);
         break;
       default:
-        core.warning(
-          `${ac.name} has an unknown option (${cleanConclusion}).  ${willNotContribute}`
-        );
+        const unknownMessage = `${ac.name} has an unknown option (${formattedConclusion}).  ${willNotContributeMsg}`;
+        core.warning(unknownMessage);
         break;
     }
   });
 }
 async function run() {
-  let outcomes = await getJobOutcomes();
-  const fallback = core.getInput('fallback-conclusion');
-  processAdditionalOutcomes(outcomes, fallback);
-  let conclusion = fallback;
+  const fallbackConclusion = core.getInput('fallback-conclusion').toLowerCase();
+  const outcomes = await getJobOutcomes();
+  processAdditionalOutcomes(outcomes, fallbackConclusion);
+  let conclusion = fallbackConclusion;
   if (outcomes.includes('cancelled')) {
     conclusion = 'cancelled';
   } else if (outcomes.includes('failure')) {
@@ -17191,7 +17191,7 @@ The workflow outcome to this point is: ${conclusion}`);
   core.setOutput('workflow_conclusion', conclusion);
   core.exportVariable('WORKFLOW_CONCLUSION', conclusion);
   core.info(`The outputs have been set`);
-  core.info(`	steps.step-id.workflow_conclusion = ${conclusion}`);
+  core.info(`	steps.<step-id>.workflow_conclusion = ${conclusion}`);
   core.info(`	env.WORKFLOW_CONCLUSION = ${conclusion}`);
 }
 run();
