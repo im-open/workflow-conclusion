@@ -23,5 +23,5 @@ outputs:
     description: Workflow conclusion
 
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js' # Can also be a relative path to the js file you want executed
