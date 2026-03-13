@@ -60,6 +60,7 @@ jobs:
       # The npm script to run to build the action.  This is typically 'npm run build' if the
       # action needs to be compiled.  For composite-run-steps actions this is typically empty.
       build-command: 'npm run build'
+      node-version: '24.x'
 
   pre-test:
     runs-on: ubuntu-latest
