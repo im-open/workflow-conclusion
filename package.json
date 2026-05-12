@@ -17,7 +17,7 @@
     "@actions/github": "^6.0.0"
   },
   "devDependencies": {
-    "esbuild": "^0.12.8",
+    "esbuild": "^0.28.0",
     "install": "^0.13.0",
     "prettier": "^2.3.0"
   }
