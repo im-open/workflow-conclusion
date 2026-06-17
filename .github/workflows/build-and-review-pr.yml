@@ -20,6 +20,9 @@ on:
   #   path filtering, a status check will not be created and we won't be able to merge the PR
   #   without disabling that requirement.  If we have a status check that is always produced,
   #   we can also use that to require all branches be up to date before they are merged.
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build-and-review-pr:
@@ -34,7 +37,7 @@ jobs:
     # This workflow assumes:
     #  - The main README.md is at the root of the repo
     #  - The README contains a contribution guidelines and usage examples section
-    uses: im-open/.github/.github/workflows/reusable-build-and-review-pr.yml@v1
+    uses: im-open/.github/.github/workflows/reusable-build-and-review-pr.yml@v2
     with:
       action-name: ${{ github.repository }}
       default-branch: main
@@ -76,7 +79,7 @@ jobs:
       - name: '-------------------------------------------------------------------------------------------------------'
         run: echo "WORKFLOW_CONCLUSION=''" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: When an unknown conclusion is present
         uses: ./
@@ -112,7 +115,7 @@ jobs:
       WORKFLOW_CONCLUSION: ''
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       #--------------------------------------
       # OUTCOME INCLUDES SUCCESS
